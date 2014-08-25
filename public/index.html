@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript">
+
+		</script>
+		<script src="./lib/vendor/lodash/lodash.min.js"></script>
+
+		<script src="./lib/vendor/helios/lib/q.min.js"></script>
+		<script src="./lib/vendor/helios/lib/uuid.js"></script>
+		<script src="./lib/vendor/helios/lib/q-comm.js"></script>
+		<script src="./lib/vendor/helios/helios.js"></script>
+		<style>
+			line {
+				stroke: #999;
+			}
+			.node.course {
+				fill: blue;
+			}
+			.node.part {
+				fill: lightblue;
+			}
+			.node.course.outcome {
+				fill: orange;
+			}
+			.node.concept {
+				fill: green;
+			}
+			.node.microConcept {
+				fill: purple;
+			}
+			.node.unit {
+				fill: red;
+			}
+			.node.activity {
+				fill: yellow;
+			}
+			.node.term {
+				fill: brown;
+			}
+			.node.equation {
+				fill: navy;
+			}
+			.node.topic {
+				fill: darkorange;
+			}
+			.node.practiceAsset {
+				fill: pink;
+			}
+			.node.learningObjective {
+				fill: lightgreen;
+			}
+
+			.label {
+				font-family: "Helvetica Neue";
+			}
+		</style>
+	</head>
+	<body>
+
+	<div id="#graph"></div>
+	<script src="./lib/vendor/d3/d3.min.js"></script>
+	<script type="text/javascript">
+
+		function prepareDataForHelios (data) {
+			var id = 0;
+			_.each(['vertices', 'edges'], function (type) {
+				_.map(data.graph[type], function (object) {
+					object._id = ++id;
+					return object;
+				});
+			});
+			return data;
+		}
+
+
+		function loadJson (jsonData) {
+			var xmlhttp;
+			var graph = this;
+			if(typeof jsonData === 'undefined') {
+				return null;
+			}
+
+			xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("GET", jsonData, false);
+			xmlhttp.send(null);
+			if (xmlhttp.status != 200)  {
+				//error
+				return false;
+			}
+			jsonData = JSON.parse(xmlhttp.responseText);
+
+			return jsonData;
+		};
+
+		var data = prepareDataForHelios(loadJson('./assets/concept_map.json'));
+
+		var graph = new Helios.GraphDatabase({
+			id: '_heliosId',
+			heliosDBPath: './lib/vendor/helios/lib/heliosDB.js'
+		});
+
+
+		var g;
+	</script>
+	<script>
+		var width = 1500,
+				height = 850;
+
+		var color = d3.scale.category20();
+
+		/* Here we define that we will use the force layout an we add some parameters to setup the basic layout of the graph */
+		var force = d3.layout.force()
+				.charge(-200)
+				.linkDistance(100)
+				.size([width, height]);
+
+		/* Here we include the graph in the page */
+		var svg = d3.select("body").append("svg")
+				.attr("width", width)
+				.attr("height", height)
+				.append('g')
+				.call(d3.behavior.zoom().on("zoom", rescale));
+
+		function rescale() {
+			trans = d3.event.translate;
+			scale = d3.event.scale || 0.5;
+			svg.attr("transform",
+//							"translate(" + trans + ")" +
+							" scale(" + scale + ")");
+//			d3.selectAll('text').attr('opacity', scale);
+
+//			if (scale < 0.5) {
+//				d3.selectAll('text').attr('style', 'display: none;');
+//			} else {
+//				d3.selectAll('text').attr('style', 'display: block');
+//			}
+
+		}
+
+		graph.loadGraphSON(data).then(function(_g_) {
+			console.log('Graph built.');
+			g = _g_;
+
+			g.V().then(function (nodes) {
+				g.E().then(function (links) {
+
+					var nodes = data.graph.vertices,
+							links = data.graph.edges;
+
+					links = _.map(links, function (link) {
+						var source = _.findWhere(nodes, {objectID: link.objectID1}),
+								target = _.findWhere(nodes, {objectID: link.objectID2});
+
+						if (!!source && !!target) {
+							link.source = source;
+							link.target = target;
+							link.value = link.type;
+							return link;
+						}
+					});
+
+					links = _.reject(links, function (link) {
+						return (typeof link === 'undefined');
+					});
+
+					force
+							.nodes(nodes)
+							.links(links)
+							.start();
+
+					var link = svg.selectAll(".link")
+							.data(links)
+							.enter().append("line")
+							.attr("class", "link")
+
+					var root = svg.selectAll(".node")
+							.data(nodes)
+							.enter();
+					var node = root.append("circle") // If you wonder why enter() is used, see the documentatin
+							.attr("class", function (d) {
+								return d.type + " node";
+							})
+							.attr("r", function (d) {
+								switch (d.type) {
+									case 'course':
+										return 80;
+									case 'part':
+										return 40;
+									case 'unit':
+										return 20;
+									case 'concept':
+										return 10;
+									default:
+										return 5;
+								}
+							}).call(force.drag);
+//					var text = root.append('text')
+//						.attr('dx', function(d) {
+//								return d.x;
+//							})
+//						.attr('dy', function(d) {
+//								return d.y;
+//							})
+//						.attr('class', 'label')
+//						.attr('font-size', 8)
+//						.text(function(d) {
+//							return d.type + ': ' + d.displayName;
+//						})
+//						.attr('opacity', 0);
+
+					force.on("tick", function () {
+						link
+							.attr("x1", function (d) {
+								return d.source.x;
+							})
+							.attr("y1", function (d) {
+								return d.source.y;
+							})
+							.attr("x2", function (d) {
+								return d.target.x;
+							})
+							.attr("y2", function (d) {
+								return d.target.y;
+							});
+
+						node
+							.attr("cx", function (d) {
+								return d.x;
+							})
+							.attr("cy", function (d) {
+								return d.y;
+							});
+
+//						text
+//							.attr('dx', function (d) {
+//								return d.x + 10;
+//							})
+//							.attr('dy', function(d) {
+//								return d.y+2;
+//							});
+
+
+					});
+				});
+			});
+		});
+
+	</script>
+
+	</body>
+</html>

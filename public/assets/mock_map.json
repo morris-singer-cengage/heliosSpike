@@ -1,0 +1,66 @@
+{
+	"graph": {
+		"mode":"NORMAL",
+		"vertices": [
+			{
+				"displayName": "lop",
+				"objectID": "3",
+				"type": "vertex"
+			},
+			{
+				"displayName": "vadas",
+				"objectID": "2",
+				"type": "vertex"
+			},
+			{
+				"displayName": "marko",
+				"objectID": "1",
+				"type": "vertex"
+			}
+		],
+		"edges": [
+			{
+				"weight": 1,
+				"type": "edge",
+				"objectID2": "4",
+				"objectID1": "5",
+				"displayName": "created"
+			},
+			{
+				"weight": 0.5,
+				"type": "edge",
+				"objectID2": "1",
+				"objectID1": "2",
+				"displayName": "knows"
+			},
+			{
+				"weight": 0.4000000059604645,
+				"type": "edge",
+				"objectID2": "1",
+				"objectID1": "3",
+				"displayName": "created"
+			},
+			{
+				"weight": 1,
+				"type": "edge",
+				"objectID2": "1",
+				"objectID1": "4",
+				"displayName": "knows"
+			},
+			{
+				"weight": 0.4000000059604645,
+				"type": "edge",
+				"objectID2": "4",
+				"objectID1": "3",
+				"displayName": "created"
+			},
+			{
+				"weight": 0.20000000298023224,
+				"type": "edge",
+				"objectID2": "6",
+				"objectID1": "3",
+				"displayName": "created"
+			}
+		]
+	}
+}
