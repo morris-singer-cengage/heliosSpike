@@ -5,12 +5,15 @@ var Helios;
         function GraphDatabase(options) {
             var heliosDBPath = options && ('heliosDBPath' in options) ? options['heliosDBPath'] : './helios/lib/heliosDB.js';
             try {
-                this.worker = new Worker(heliosDBPath);
-                this.db = Q_COMM.Connection(this.worker, null, {
-                    max: 1024
-                });
+//                this.worker = new Worker(heliosDBPath);
+//                this.db = Q_COMM.Connection(this.worker, null, {
+//                    max: 1024
+//                });
+				this.db = require('./lib/heliosDB.js');
             } catch(err){
-                throw new Error(err.message);
+				err.message = err.message || 'Unspecified error.';
+				console.log('Error: '+err.message);
+                throw new Error('Error: ' + err.message);
             }
         }
         
@@ -41,7 +44,7 @@ var Helios;
                 }
             ]).then(function (message) {
                 console.log(message);
-            }).end();
+            }).done();
         };
         GraphDatabase.prototype.createEIndex = function (idxName) {
             this.db.invoke("dbCommand", [
@@ -53,7 +56,7 @@ var Helios;
                 }
             ]).then(function (message) {
                 console.log(message);
-            }).end();
+            }).done();
         };
         GraphDatabase.prototype.deleteVIndex = function (idxName) {
             this.db.invoke("dbCommand", [
@@ -65,7 +68,7 @@ var Helios;
                 }
             ]).then(function (message) {
                 console.log(message);
-            }).end();
+            }).done();
         };
         GraphDatabase.prototype.deleteEIndex = function (idxName) {
             this.db.invoke("dbCommand", [
@@ -77,7 +80,7 @@ var Helios;
                 }
             ]).then(function (message) {
                 console.log(message);
-            }).end();
+            }).done();
         };*/
 
         GraphDatabase.prototype.loadGraphSON = function (jsonData) {
@@ -146,7 +149,7 @@ var Helios;
             ]).then(function (message) {
                 worker.terminate();
                 console.log('Closed');
-            }).end();
+            }).done();
         };
         return GraphDatabase;
     })();
@@ -206,7 +209,7 @@ var Helios;
                 if(trace) {
                     this.db.invoke("startTrace", true).fail(function (err) {
                         console.log(err.message);
-                    }).end();
+                    }).done();
                 }
                 if(func == 'pin') {
                     this.placeholder = this.messages.length;
@@ -232,9 +235,11 @@ var Helios;
                 return result;
             }, function (error) {
                 return error;
-            }).then(success, error).end();
+            }).then(success, error).done();
         };
         return Pipeline;
     })();
     Helios.Pipeline = Pipeline;    
 })(Helios || (Helios = {}));
+
+module.exports = Helios;

@@ -1,0 +1,35 @@
+{
+  "name": "helios",
+  "version": "0.2.0",
+  "description": "In-memory graph database for node.js",
+  "main": "helios.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morris-singer-cengage/helios-node.git"
+  },
+  "keywords": [
+    "graph",
+    "database",
+    "node",
+    "graphdb",
+    "gremlin"
+  ],
+  "author": "Morris Singer",
+  "license": "MIT",
+  "dependencies": {
+    "q": "^1.0.1",
+    "request": "^2.40.0",
+    "sax": "^0.6.0",
+    "underscore": "^1.6.0"
+  },
+  "devDependencies": {
+    "grunt-mocha-test": "^0.11.0",
+    "mocha": "^1.21.4"
+  }
+}

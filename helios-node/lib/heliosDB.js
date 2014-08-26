@@ -1,4 +1,8 @@
 "use strict";
+
+var Q = require('q'),
+	sax = require('sax');
+
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -255,25 +259,7 @@ var Helios;
             if(!!jsonData.edges) {
                 this.loadEdges(jsonData.edges);
             }
-            if(Utils.isString(jsonData)) {
-                xmlhttp = new XMLHttpRequest();
-                xmlhttp.open("GET", jsonData, false);
-                xmlhttp.send(null);
-                if (xmlhttp.status != 200)  {
-                    //error
-                    return false;
-                }
-                jsonData = JSON.parse(xmlhttp.responseText);
-                if(!!jsonData.graph) {
-                    jsonData = jsonData.graph;
-                }
-                if(!!jsonData.vertices.length) {
-                    graph.loadVertices(jsonData.vertices);
-                }
-                if(jsonData.edges) {
-                    graph.loadEdges(jsonData.edges);
-                }
-            }
+
             return true;
         };
         GraphDatabase.prototype.loadGraphML = function (xmlData) {
@@ -373,21 +359,7 @@ var Helios;
             if(Utils.isUndefined(xmlData)) {
                 return false;
             }
-            if(Utils.isString(xmlData)) {
-                fileExt = xmlData.split('.').pop();
-                if(fileExt.toLowerCase() === 'xml') {
-                    xmlhttp = new XMLHttpRequest();
-                    xmlhttp.open("GET", xmlData, false);
-                    xmlhttp.send(null);
-                    if (xmlhttp.status != 200)  {
-                        //error
-                        return false;
-                    }
-                    parser.write(xmlhttp.responseText).close();
-                } else {
-                    return false;
-                }
-            }
+
             return true;
         };
         GraphDatabase.prototype.v = function () {
@@ -2485,37 +2457,41 @@ var Helios;
         return Utils;
     })();    
 })(Helios || (Helios = {}));
-try  {
-    importScripts('sax.js', 'q.min.js', 'uuid.js', 'q-comm.js');
-    var i, l, g, r;
-    Q_COMM.Connection(this, {
-        // init: function (params) {
-        //     g = !!params ? new Helios.GraphDatabase(params) : new Helios.GraphDatabase();
-        //     return 'Database created';
-        // },
-        dbCommand: function (params) {
-            r = g = g || new Helios.GraphDatabase();
-            for(i = 0 , l = params.length; i < l; i++) {
-                r = r[params[i].method].apply(r, params[i].parameters);
-            }
-            return r;
-        },
-        run: function (params) {
-            r = g;
-            params.push({
-                method: 'emit',
-                parameters: []
-            });
-            for(i = 0 , l = params.length; i < l; i++) {
-                r = r[params[i].method].apply(r, params[i].parameters);
-            }
-            g.startTrace(false);
-            return r;
-        },
-        startTrace: function (param) {
-            g.startTrace(param);
-        }
-    });
-} catch (exception) {
-    console.log(exception.message);
-}
+
+var i, l, g, r;
+var mockWorker = {
+	dbCommand: function (params) {
+		r = g = g || new Helios.GraphDatabase();
+		for(i = 0 , l = params.length; i < l; i++) {
+			r = r[params[i].method].apply(r, params[i].parameters);
+		}
+		return r;
+	},
+	run: function (params) {
+		r = g;
+		params.push({
+			method: 'emit',
+			parameters: []
+		});
+		for(i = 0 , l = params.length; i < l; i++) {
+			r = r[params[i].method].apply(r, params[i].parameters);
+		}
+		g.startTrace(false);
+		return r;
+	},
+	startTrace: function (param) {
+		g.startTrace(param);
+	},
+	invoke: function(functionName, args) {
+		var deferred = Q.defer();
+
+		// Next Tick
+		setTimeout(function() {
+			deferred.resolve(mockWorker[functionName](args));
+		}, 0);
+
+		return deferred.promise;
+	}
+};
+
+module.exports = mockWorker;

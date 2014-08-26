@@ -10,6 +10,12 @@
   "author": "Morris Singer for Cengage Learning, Inc.",
   "license": "None",
   "dependencies": {
-    "express": "^4.8.5"
+    "body-parser": "^1.6.5",
+    "express": "^4.8.5",
+    "js-beautify": "^1.5.1",
+    "q": "^1.0.1",
+    "request": "^2.40.0",
+    "sax": "^0.6.0",
+    "underscore": "^1.6.0"
   }
 }
