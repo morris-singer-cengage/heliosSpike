@@ -2,6 +2,8 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+		<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular.js" type="text/javascript"></script>
@@ -10,13 +12,29 @@
 			angular.module('queryTest', [])
 					.controller('queryController', function($scope, $http) {
 
+						$scope.loading=false;
+						$scope.historyCount = 0;
+						$scope.chemistryCount = 0;
+
 						$scope.runQuery = function() {
+							$scope.loading=true;
 							$http.post('/query', {q: $scope.query}).
 									success(function(data, status, headers, config) {
-										$scope.result=js_beautify(JSON.stringify(data));
-
+										$scope.loading=false;
+										$scope.history=js_beautify(JSON.stringify(data.history), {
+											"brace_style": "expand"
+										});
+										$scope.chemistry=js_beautify(JSON.stringify(data.chemistry), {
+											"brace_style": "expand"
+										});
+										$scope.historyCount = data.history.length;
+										$scope.chemistryCount = data.chemistry.length
 									}).
 									error(function(data, status, headers, config) {
+										$scope.loading=false;
+										$scope.history = '[Error]';
+										$scope.chemistry = '[Error]';
+
 										alert('There was a problem.');
 									});
 						}
@@ -26,10 +44,42 @@
 	<body ng-app="queryTest">
 	<div class="container" ng-controller="queryController">
 		<div class="row">
-			<div class="col-xs-12">
-				<br />
-				<div style="width: 100%; height: 400px; border: 1px solid #333; overflow: scroll; white-space: pre; font-size: 12px;;"><code ng-bind="result"></code></div>
+			<h1>Helios-Node Test Harness</h1>
+			<hr />
+		</div>
+		<div class="row">
+			<div class="col-xs-6" style="position: relative;">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">History</h3>
+					</div>
+					<div class="panel-body" style="overflow: scroll; padding: 0;">
+						<div style="position: absolute; left: 50px; top: 50px;" ng-show="loading">
+							<i class="fa fa-spinner fa-spin fa-5x"></i>
+						</div>
+
+						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;"><code ng-bind="history" ng-hide="loading"></code></div>
+					</div>
+					<div class="panel-footer">Count: {{historyCount}}</div>
+				</div>
 			</div>
+			<div class="col-xs-6" style="position: relative;">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Chemistry</h3>
+					</div>
+					<div class="panel-body"style="overflow: scroll; padding: 0;">
+						<div style="position: absolute; left: 50px; top: 50px;" ng-show="loading">
+							<i class="fa fa-spinner fa-spin fa-5x"></i>
+						</div>
+
+						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;"><code ng-bind="chemistry" ng-hide="loading"></code></div>
+					</div>
+					<div class="panel-footer">Count: {{chemistryCount}}</div>
+				</div>
+
+			</div>
+
 		</div>
 		<div class="row">
 			<br />
@@ -40,7 +90,7 @@
 					<div class="form-group">
 						<div class="input-group">
 							<span class="input-group-addon">graph.</span>
-							<input class="form-control" type="text" placeholder="Enter query (e.g., .V().index(1)" ng-model="query">
+							<input class="form-control" type="text" placeholder="Enter query, e.g., V().index(1)" ng-model="query">
 							<span class="input-group-btn">
 							  <button class="btn btn-default" type="button" ng-click="runQuery();">
 								  Run

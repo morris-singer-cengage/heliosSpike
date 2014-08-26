@@ -1,10 +1,10 @@
 var expect = require('./chai.js').expect;
-var Helios = require('../helios.js');
+var Helios = require('../lib/heliosDB.js');
 var g;
+
 before(function(done){
-	var db = new Helios.GraphDatabase({
-		heliosDBPath: './lib/heliosDB.js'
-	});
+	var db = new Helios.GraphDatabase();
+
 	var testData = {
 		"graph": {
 			"mode":"NORMAL",
@@ -41,582 +41,442 @@ after(function(done){
 describe('Simple Transform', function() {
 
 	describe('id', function() {
-		it("should return all ids", function(done) {
-			g.v().id().then(function (result) {
-				expect(result).to.eql([1,2,3,4,5,6]);
-				done();
-			});
+		it("should return all ids", function(){
+			var result = g.v().id().emit();
+			expect(result).to.eql([1,2,3,4,5,6]);
 		});
 	});
 
 	describe('label', function() {
-		it("should return created", function(done) {
-			g.v(6).outE().label().then(function (result) {
-				expect(result).to.eql(['created']);
-				done();
-			});
+		it("should return created", function(){
+			var result = g.v(6).outE().label().emit();
+			expect(result).to.eql(['created']);
 		});
 	});
 
 	describe('key', function() {
-		it("should return name property = lop", function(done) {
-			g.v(3).property('name').then(function (result) {
-				expect(result).to.eql(['lop']);
-				done();
-			});
+		it("should return name property = lop", function(){
+			var result = g.v(3).property('name').emit();
+			expect(result).to.eql(['lop']);
 		});
 	});
 
 	describe('v', function() {
 
-		it("should return all vertices", function(done) {
-			g.v().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should return all vertices", function(){
+			var result = g.v().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should get id 1", function(done) {
-			g.v(1).then(function (result) {
-				expect(result.length).to.equal(1);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should get id 1", function(){
+			var result = g.v(1).emit();
+			expect(result.length).to.equal(1);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should return id 1 & 4", function(done) {
-			g.v(1, 4).then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return id 1 & 4", function(){
+			var result = g.v(1, 4).emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'marko');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return lang=java", function(done) {
-			g.v({'lang':{$eq:'java'}}).then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'lop');
-				expect(result).to.have.deep.property('[1].name', 'ripple');
-				done();
-			});
+		it("should return lang=java", function(){
+			var result = g.v({'lang':{$eq:'java'}}).emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'lop');
+			expect(result).to.have.deep.property('[1].name', 'ripple');
 		});
 
-		it("should return empty Array", function(done) {
-			g.v({'lang':{$eq:'something'}}).then(function (result) {
-				expect(result).to.have.length(0);
-				done();
-			});
+		it("should return empty Array", function(){
+			expect(g.v({'lang':{$eq:'something'}}).emit()).to.have.length(0);
 		});
 
 	});
 
 	describe('e', function() {
 
-		it("should return all vertices", function(done) {
-			g.e().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0]._id', 7);
-				done();
-			});
+		it("should return all vertices", function(){
+			var result = g.e().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0]._id', 7);
 		});
 
-		it("should get id 1", function(done) {
-			g.e(7).then(function (result) {
-				expect(result.length).to.equal(1);
-				done();
-			});
+		it("should get id 1", function(){
+			var result = g.e(7).emit();
+			expect(result.length).to.equal(1);
 		});
 
-		it("should return empty Array", function(done) {
-			g.e({'lang':{$eq:'something'}}).then(function (result) {
-				expect(result).to.have.length(0);
-				done();
-			});
+		it("should return empty Array", function(){
+			expect(g.e({'lang':{$eq:'something'}}).emit()).to.have.length(0);
 		});
 
-		it("should return id 7 & 7", function(done) {
-			g.e(7, 7).then(function (result) {
-				expect(result.length).to.equal(2);
-				done();
-			});
+		it("should return id 7 & 7", function(){
+			var result = g.e(7, 7).emit();
+			expect(result.length).to.equal(2);
+
 		});
 
-		it("should return lang=java", function(done) {
-			g.v({'lang':{$eq:'java'}}).then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'lop');
-				expect(result).to.have.deep.property('[1].name', 'ripple');
-				done();
-			});
+		it("should return lang=java", function(){
+			var result = g.v({'lang':{$eq:'java'}}).emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'lop');
+			expect(result).to.have.deep.property('[1].name', 'ripple');
 		});
 
 	});
 
 	describe('v.out', function() {
 
-		it("should get all out vertices", function(done) {
-			g.v().out().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should get all out vertices", function(){
+			var result = g.v().out().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should filter for 'knows'", function(done) {
-			g.v().out('knows').then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should filter for 'knows'", function(){
+			var result = g.v().out('knows').emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should filter for 'knows' as array", function(done) {
-			g.v().out(['knows']).then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should filter for 'knows' as array", function(){
+			var result = g.v().out(['knows']).emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should filter for 'knows' & 'created'", function(done) {
-			g.v().out('knows', 'created').then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'lop');
-				done();
-			});
+		it("should filter for 'knows' & 'created'", function(){
+			var result = g.v().out('knows', 'created').emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'lop');
 		});
 
-		it("should filter for 'knows' & 'created' as array", function(done) {
-			g.v().out(['knows', 'created']).then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'lop');
-				done();
-			});
+		it("should filter for 'knows' & 'created' as array", function(){
+			var result = g.v().out(['knows', 'created']).emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'lop');
 		});
 
-		it("should get out vertices from id 1", function(done) {
-			g.v(1).out().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should get out vertices from id 1", function(){
+			var result = g.v(1).out().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should return out vertices from id 1 & 4", function(done) {
-			g.v(1, 4).out().then(function (result) {
-				expect(result.length).to.equal(5);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return out vertices from id 1 & 4", function(){
+			var result = g.v(1, 4).out().emit();
+			expect(result.length).to.equal(5);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return out vertices from id 1 & 4 passed in as array", function(done) {
-			g.v([1, 4]).out().then(function (result) {
-				expect(result.length).to.equal(5);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return out vertices from id 1 & 4 passed in as array", function(){
+			var result = g.v([1, 4]).out().emit();
+			expect(result.length).to.equal(5);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return out vertices from name=marko", function(done) {
-			g.v({'name':{$eq:'marko'}}).out().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should return out vertices from name=marko", function(){
+			var result = g.v({'name':{$eq:'marko'}}).out().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
 	});
 
 	describe('v.outE.inV', function() {
 
-		it("should get all out vertices", function(done) {
-			g.v().outE().inV().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should get all out vertices", function(){
+			var result = g.v().outE().inV().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should filter for 'knows'", function(done) {
-			g.v().outE('knows').inV().then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should filter for 'knows'", function(){
+			var result = g.v().outE('knows').inV().emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should filter for 'knows' as array", function(done) {
-			g.v().outE(['knows']).inV().then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should filter for 'knows' as array", function(){
+			var result = g.v().outE(['knows']).inV().emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should filter for 'knows' & 'created'", function(done) {
-			g.v().outE('knows', 'created').inV().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'lop');
-				done();
-			});
+		it("should filter for 'knows' & 'created'", function(){
+			var result = g.v().outE('knows', 'created').inV().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'lop');
 		});
 
-		it("should filter for 'knows' & 'created' as array", function(done) {
-			g.v().outE(['knows', 'created']).inV().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'lop');
-				done();
-			});
+		it("should filter for 'knows' & 'created' as array", function(){
+			var result = g.v().outE(['knows', 'created']).inV().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'lop');
 		});
 
-		it("should get out vertices from id 1", function(done) {
-			g.v(1).outE().inV().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should get out vertices from id 1", function(){
+			var result = g.v(1).outE().inV().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
-		it("should return out vertices from id 1 & 4", function(done) {
-			g.v(1, 4).outE().inV().then(function (result) {
-				expect(result.length).to.equal(5);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return out vertices from id 1 & 4", function(){
+			var result = g.v(1, 4).outE().inV().emit();
+			expect(result.length).to.equal(5);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return out vertices from id 1 & 4 passed in as array", function(done) {
-			g.v([1, 4]).outE().inV().then(function (result) {
-				expect(result.length).to.equal(5);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return out vertices from id 1 & 4 passed in as array", function(){
+			var result = g.v([1, 4]).outE().inV().emit();
+			expect(result.length).to.equal(5);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return out vertices from name=marko", function(done) {
-			g.v({'name':{$eq:'marko'}}).outE().inV().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'vadas');
-				done();
-			});
+		it("should return out vertices from name=marko", function(){
+			var result = g.v({'name':{$eq:'marko'}}).outE().inV().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'vadas');
 		});
 
 	});
 
 	describe('v.in', function() {
 
-		it("should get all in vertices", function(done) {
-			g.v().in().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				expect(result).to.have.deep.property('[1].name', 'marko');
-				done();
-			});
+		it("should get all in vertices", function(){
+			var result = g.v().in().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
+			expect(result).to.have.deep.property('[1].name', 'marko');
 		});
 
-		it("should filter for 'knows'", function(done) {
-			g.v().in('knows').then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows'", function(){
+			var result = g.v().in('knows').emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should filter for 'knows' as array", function(done) {
-			g.v().in(['knows']).then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows' as array", function(){
+			var result = g.v().in(['knows']).emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should filter for 'knows' & 'created'", function(done) {
-			g.v().in('knows', 'created').then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows' & 'created'", function(){
+			var result = g.v().in('knows', 'created').emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should filter for 'knows' & 'created' as array", function(done) {
-			g.v().in(['knows', 'created']).then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows' & 'created' as array", function(){
+			var result = g.v().in(['knows', 'created']).emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should get in vertices from id 3", function(done) {
-			g.v(3).in().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should get in vertices from id 3", function(){
+			var result = g.v(3).in().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should return in vertices from id 3 & 4", function(done) {
-			g.v(3, 4).in().then(function (result) {
-				expect(result.length).to.equal(4);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return in vertices from id 3 & 4", function(){
+			var result = g.v(3, 4).in().emit();
+			expect(result.length).to.equal(4);
+			expect(result).to.have.deep.property('[0].name', 'marko');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return in vertices from id 3 & 4 passed in as array", function(done) {
-			g.v([3, 4]).in().then(function (result) {
-				expect(result.length).to.equal(4);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return in vertices from id 3 & 4 passed in as array", function(){
+			var result = g.v([3, 4]).in().emit();
+			expect(result.length).to.equal(4);
+			expect(result).to.have.deep.property('[0].name', 'marko');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return in vertices from name=lop", function(done) {
-			g.v({'name':{$eq:'lop'}}).in().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should return in vertices from name=lop", function(){
+			var result = g.v({'name':{$eq:'lop'}}).in().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
 	});
 
 	describe('v.inE.outV', function() {
 
-		it("should get all out vertices", function(done) {
-			g.v().inE().outV().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should get all out vertices", function(){
+			var result = g.v().inE().outV().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should filter for 'knows'", function(done) {
-			g.v().inE('knows').outV().then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows'", function(){
+			var result = g.v().inE('knows').outV().emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should filter for 'knows' as array", function(done) {
-			g.v().inE(['knows']).outV().then(function (result) {
-				expect(result.length).to.equal(2);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows' as array", function(){
+			var result = g.v().inE(['knows']).outV().emit();
+			expect(result.length).to.equal(2);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should filter for 'knows' & 'created'", function(done) {
-			g.v().inE('knows', 'created').outV().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows' & 'created'", function(){
+			var result = g.v().inE('knows', 'created').outV().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should filter for 'knows' & 'created' as array", function(done) {
-			g.v().inE(['knows', 'created']).outV().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should filter for 'knows' & 'created' as array", function(){
+			var result = g.v().inE(['knows', 'created']).outV().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should get out vertices from id 3", function(done) {
-			g.v(3).inE().outV().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should get out vertices from id 3", function(){
+			var result = g.v(3).inE().outV().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
-		it("should return out vertices from id 3 & 4", function(done) {
-			g.v(3, 4).inE().outV().then(function (result) {
-				expect(result.length).to.equal(4);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return out vertices from id 3 & 4", function(){
+			var result = g.v(3, 4).inE().outV().emit();
+			expect(result.length).to.equal(4);
+			expect(result).to.have.deep.property('[0].name', 'marko');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return out vertices from id 3 & 4 passed in as array", function(done) {
-			g.v([3, 4]).inE().outV().then(function (result) {
-				expect(result.length).to.equal(4);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return out vertices from id 3 & 4 passed in as array", function(){
+			var result = g.v([3, 4]).inE().outV().emit();
+			expect(result.length).to.equal(4);
+			expect(result).to.have.deep.property('[0].name', 'marko');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return out vertices from name=lop", function(done) {
-			g.v({'name':{$eq:'lop'}}).inE().outV().then(function (result) {
-				expect(result.length).to.equal(3);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				done();
-			});
+		it("should return out vertices from name=lop", function(){
+			var result = g.v({'name':{$eq:'lop'}}).inE().outV().emit();
+			expect(result.length).to.equal(3);
+			expect(result).to.have.deep.property('[0].name', 'marko');
 		});
 
 	});
 
 	describe('v.both', function() {
 
-		it("should get all out vertices", function(done) {
-			g.v().both().then(function (result) {
-				expect(result.length).to.equal(12);
-				done();
-			});
+		it("should get all out vertices", function(){
+			var result = g.v().both().emit();
+			expect(result.length).to.equal(12);
 		});
 
-		it("should filter for 'knows'", function(done) {
-			g.v().both('knows').then(function (result) {
-				expect(result.length).to.equal(4);
-				done();
-			});
+		it("should filter for 'knows'", function(){
+			var result = g.v().both('knows').emit();
+			expect(result.length).to.equal(4);
 		});
 
-		it("should filter for 'knows' as array", function(done) {
-			g.v().both(['knows']).then(function (result) {
-				expect(result.length).to.equal(4);
-				done();
-			});
+		it("should filter for 'knows' as array", function(){
+			var result = g.v().both(['knows']).emit();
+			expect(result.length).to.equal(4);
 		});
 
-		it("should filter for 'knows' & 'created'", function(done) {
-			g.v().both('knows', 'created').then(function (result) {
-				expect(result.length).to.equal(12);
-				done();
-			});
+		it("should filter for 'knows' & 'created'", function(){
+			var result = g.v().both('knows', 'created').emit();
+			expect(result.length).to.equal(12);
 		});
 
-		it("should filter for 'knows' & 'created' as array", function(done) {
-			g.v().both(['knows', 'created']).then(function (result) {
-				expect(result.length).to.equal(12);
-				done();
-			});
+		it("should filter for 'knows' & 'created' as array", function(){
+			var result = g.v().both(['knows', 'created']).emit();
+			expect(result.length).to.equal(12);
 		});
 
-		it("should get both vertices from id 4", function(done) {
-			g.v(4).both().then(function (result) {
-				expect(result.length).to.equal(3);
-				done();
-			});
+		it("should get both vertices from id 4", function(){
+			var result = g.v(4).both().emit();
+			expect(result.length).to.equal(3);
 		});
 
-		it("should return both vertices from id 3 & 4", function(done) {
-			g.v(3, 4).both().then(function (result) {
-				expect(result.length).to.equal(6);
-				done();
-			});
+		it("should return both vertices from id 3 & 4", function(){
+			var result = g.v(3, 4).both().emit();
+			expect(result.length).to.equal(6);
 		});
 
-		it("should return both vertices from id 3 & 4 passed in as array", function(done) {
-			g.v([3, 4]).both().then(function (result) {
-				expect(result.length).to.equal(6);
-				expect(result).to.have.deep.property('[0].name', 'marko');
-				expect(result).to.have.deep.property('[1].name', 'josh');
-				done();
-			});
+		it("should return both vertices from id 3 & 4 passed in as array", function(){
+			var result = g.v([3, 4]).both().emit();
+			expect(result.length).to.equal(6);
+			expect(result).to.have.deep.property('[0].name', 'marko');
+			expect(result).to.have.deep.property('[1].name', 'josh');
 		});
 
-		it("should return both vertices from name=josh", function(done) {
-			g.v({'name':{$eq:'josh'}}).both().then(function (result) {
-				expect(result.length).to.equal(3);
-				done();
-			});
+		it("should return both vertices from name=josh", function(){
+			var result = g.v({'name':{$eq:'josh'}}).both().emit();
+			expect(result.length).to.equal(3);
 		});
 
 	});
 
 	describe('v.bothE.bothV', function() {
 
-		it("should get return bothE", function(done) {
-			g.v().bothE().then(function (result) {
-				expect(result.length).to.equal(12);
-				done();
-			});
+		it("should get return bothE", function(){
+			var result = g.v().bothE().emit();
+			expect(result.length).to.equal(12);
 		});
 
-		it("should get all both vertices", function(done) {
-			g.v().bothE().bothV().then(function (result) {
-				expect(result.length).to.equal(24);
-				done();
-			});
+		it("should get all both vertices", function(){
+			var result = g.v().bothE().bothV().emit();
+			expect(result.length).to.equal(24);
 		});
 
-		it("should filter for 'knows'", function(done) {
-			g.v().bothE('knows').bothV().then(function (result) {
-				expect(result.length).to.equal(8);
-				done();
-			});
+		it("should filter for 'knows'", function(){
+			var result = g.v().bothE('knows').bothV().emit();
+			expect(result.length).to.equal(8);
 		});
 
-		it("should filter for 'knows' as array", function(done) {
-			g.v().bothE(['knows']).bothV().then(function (result) {
-				expect(result.length).to.equal(8);
-				done();
-			});
+		it("should filter for 'knows' as array", function(){
+			var result = g.v().bothE(['knows']).bothV().emit();
+			expect(result.length).to.equal(8);
 		});
 
-		it("should filter for 'knows' & 'created'", function(done) {
-			g.v().bothE('knows', 'created').bothV().then(function (result) {
-				expect(result.length).to.equal(24);
-				done();
-			});
+		it("should filter for 'knows' & 'created'", function(){
+			var result = g.v().bothE('knows', 'created').bothV().emit();
+			expect(result.length).to.equal(24);
 		});
 
-		it("should filter for 'knows' & 'created' as array", function(done) {
-			g.v().bothE(['knows', 'created']).bothV().then(function (result) {
-				expect(result.length).to.equal(24);
-				done();
-			});
+		it("should filter for 'knows' & 'created' as array", function(){
+			var result = g.v().bothE(['knows', 'created']).bothV().emit();
+			expect(result.length).to.equal(24);
 		});
 
-		it("should get both vertices from id 4", function(done) {
-			g.v(4).bothE().bothV().then(function (result) {
-				expect(result).to.have.length(6);
-				done();
-			});
+		it("should get both vertices from id 4", function(){
+			expect(g.v(4).bothE().bothV().emit()).to.have.length(6);
 		});
 
-		it("should return both vertices from id 1 & 4", function(done) {
-			g.v(1, 4).bothE().bothV().then(function (result) {
-				expect(result).to.have.length(12);
-				done();
-			});
+		it("should return both vertices from id 1 & 4", function(){
+			expect(g.v(1, 4).bothE().bothV().emit()).to.have.length(12);
+
 		});
 
-		it("should return both vertices from id 1 & 4 passed in as array", function(done) {
-			g.v([1, 4]).bothE().bothV().then(function (result) {
-				expect(result).to.have.length(12);
-				done();
-			});
+		it("should return both vertices from id 1 & 4 passed in as array", function(){
+			expect(g.v([1, 4]).bothE().bothV().emit()).to.have.length(12);
+
 		});
 
-		it("should return both vertices from name=marko", function(done) {
-			g.v({'name':{$eq:'marko'}}).bothE().bothV().then(function (result) {
-				expect(result.length).to.equal(6);
-				done();
-			});
+		it("should return both vertices from name=marko", function(){
+			var result = g.v({'name':{$eq:'marko'}}).bothE().bothV().emit();
+			expect(result.length).to.equal(6);
 		});
 	});
 
 	describe('hash', function() {
 
-		it("should contain JSON object with keys 1 & 4", function(done) {
-			g.v(1, 4).hash().then(function (result) {
-				expect(result).to.be.an('object');
-				expect(result).to.include.keys('1','4');
-				done();
-			});
+		it("should contain JSON object with keys 1 & 4", function(){
+			var result = g.v(1, 4).hash().emit();
+			expect(result).to.be.an('object');
+			expect(result).to.include.keys('1','4');
 		});
 	});
 

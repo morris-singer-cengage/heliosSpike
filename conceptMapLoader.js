@@ -1,4 +1,3 @@
-var Helios = require('./helios-node/helios.js');
 var Q = require('q');
 var request = require('request');
 var _ = require('underscore')
@@ -10,6 +9,8 @@ var Loader = function(url) {
 
 Loader.prototype.loadData = function() {
 	var that = this;
+
+	that.startLoad = new Date();
 
 	function prepareDataForHelios (data) {
 		var graphSON = {
@@ -66,6 +67,10 @@ Loader.prototype.loadData = function() {
 		}
 		var data = JSON.parse(body);
 		data = prepareDataForHelios(data);
+
+		that.endLoad = new Date();
+
+		console.log('Data loaded from '+that.url+' in '+(that.endLoad-that.startLoad)+' milliseconds.');
 		deferred.resolve(data);
 	});
 
