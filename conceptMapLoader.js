@@ -12,7 +12,7 @@ Loader.prototype.loadData = function() {
 
 	that.startLoad = new Date();
 
-	function prepareDataForHelios (data) {
+	function prepareDataForPonyDB (data) {
 		var graphSON = {
 			graph: {
 				mode: 'NORMAL'
@@ -66,7 +66,7 @@ Loader.prototype.loadData = function() {
 			throw new Error('Error loading json from url: '+that.url)
 		}
 		var data = JSON.parse(body);
-		data = prepareDataForHelios(data);
+		data = prepareDataForPonyDB(data);
 
 		that.endLoad = new Date();
 

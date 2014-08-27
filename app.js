@@ -21,6 +21,7 @@ var historyGraph, chemistryGraph;
 historyLoader.loadData().then(function(data) {
 	var graphStart = new Date();
 	historyGraph = new Helios.GraphDatabase();
+	historyGraph.startTrace(true);
 	var graphEnd = new Date();
 	console.log('History graph db created in '+(graphEnd-graphStart)+' milliseconds');
 
@@ -36,6 +37,7 @@ historyLoader.loadData().then(function(data) {
 chemistryLoader.loadData().then(function(data) {
 	var chemistryGraphStart = new Date();
 	chemistryGraph = new Helios.GraphDatabase();
+	chemistryGraph.startTrace(true);
 	var chemistryGraphEnd = new Date();
 	console.log('Chemistry graph db created in '+(chemistryGraphEnd - chemistryGraphStart)+' milliseconds');
 

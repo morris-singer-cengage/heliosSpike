@@ -404,6 +404,7 @@ var GraphDatabase = (function () {
 		}
 		return this._.startPipe(pipe);
 	};
+	GraphDatabase.prototype.V = GraphDatabase.prototype.v;
 	GraphDatabase.prototype.e = function () {
 		var args = [];
 		for (var _i = 0; _i < (arguments.length - 0); _i++) {
@@ -525,6 +526,8 @@ var GraphDatabase = (function () {
 		}
 		return this._.startPipe(pipe);
 	};
+	GraphDatabase.prototype.E = GraphDatabase.prototype.e;
+
 	return GraphDatabase;
 })();
 
