@@ -4,29 +4,35 @@
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
 		<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
+		<style>
+			pre.renderjson {
+				border: 0;
+				background: none;
+			}
+		</style>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular.js" type="text/javascript"></script>
-		<script type="text/javascript" src="lib/vendor/jsbeautify/jsbeautify.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.22/angular.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="lib/vendor/renderjson/renderjson.js"></script>
 		<script type="text/javascript">
 			angular.module('queryTest', [])
 					.controller('queryController', function($scope, $http) {
-
+						renderjson.set_show_to_level(1);
 						$scope.loading=false;
 						$scope.historyCount = 0;
 						$scope.chemistryCount = 0;
 
 						$scope.runQuery = function() {
 							$scope.loading=true;
+							angular.element('#historyResult').html('');
+							angular.element('#chemistryResult').html('');
+
 							$http.post('/query', {q: $scope.query}).
 									success(function(data, status, headers, config) {
 										$scope.loading=false;
-										$scope.history=js_beautify(JSON.stringify(data.history), {
-											"brace_style": "expand"
-										});
-										$scope.chemistry=js_beautify(JSON.stringify(data.chemistry), {
-											"brace_style": "expand"
-										});
+										angular.element('#historyResult').append(renderjson(data.history));
+										angular.element('#chemistryResult').append(renderjson(data.chemistry));
+
 										$scope.historyCount = data.history.length;
 										$scope.chemistryCount = data.chemistry.length
 									}).
@@ -44,7 +50,7 @@
 	<body ng-app="queryTest">
 	<div class="container" ng-controller="queryController">
 		<div class="row">
-			<h1>Helios-Node Test Harness</h1>
+			<h1>PonyDB Test Harness</h1>
 			<hr />
 		</div>
 		<div class="row">
@@ -58,7 +64,9 @@
 							<i class="fa fa-spinner fa-spin fa-5x"></i>
 						</div>
 
-						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;"><code ng-bind="history" ng-hide="loading"></code></div>
+						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;">
+							<div id="historyResult" ng-hide="loading"></div>
+						</div>
 					</div>
 					<div class="panel-footer">Count: {{historyCount}}</div>
 				</div>
@@ -73,7 +81,9 @@
 							<i class="fa fa-spinner fa-spin fa-5x"></i>
 						</div>
 
-						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;"><code ng-bind="chemistry" ng-hide="loading"></code></div>
+						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;">
+							<div id="chemistryResult" ng-hide="loading"></div>
+						</div>
 					</div>
 					<div class="panel-footer">Count: {{chemistryCount}}</div>
 				</div>
@@ -88,15 +98,11 @@
 			<form class=" col-xs-12" ng-submit="runQuery();">
 				<div class="form-group">
 					<div class="form-group">
-						<div class="input-group">
-							<span class="input-group-addon">graph.</span>
-							<input class="form-control" type="text" placeholder="Enter query, e.g., V().index(1)" ng-model="query">
-							<span class="input-group-btn">
-							  <button class="btn btn-default" type="button" ng-click="runQuery();">
-								  Run
-							  </button>
-						   </span>
-						</div>
+						<textarea class="form-control" type="text" placeholder="Enter query, e.g., V().index(1)" ng-model="query"></textarea>
+						<br />
+						<button class="btn btn-primary" type="button" ng-click="runQuery();">
+							<i class="fa fa-database"></i> Query PonyDB
+						</button>
 					</div>
 				</div>
 			</form>
