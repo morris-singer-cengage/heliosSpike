@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var Helios = require('./helios-node/lib/heliosDB.js');
+var PonyDB = require('./ponydb/ponydb.js');
 var _ = require('underscore');
 
 app.use(express.static(__dirname + '/public'));
@@ -20,8 +20,7 @@ var historyGraph, chemistryGraph;
 
 historyLoader.loadData().then(function(data) {
 	var graphStart = new Date();
-	historyGraph = new Helios.GraphDatabase();
-	historyGraph.startTrace(true);
+	historyGraph = new PonyDB.GraphDatabase();
 	var graphEnd = new Date();
 	console.log('History graph db created in '+(graphEnd-graphStart)+' milliseconds');
 
@@ -36,8 +35,7 @@ historyLoader.loadData().then(function(data) {
 
 chemistryLoader.loadData().then(function(data) {
 	var chemistryGraphStart = new Date();
-	chemistryGraph = new Helios.GraphDatabase();
-	chemistryGraph.startTrace(true);
+	chemistryGraph = new PonyDB.GraphDatabase();
 	var chemistryGraphEnd = new Date();
 	console.log('Chemistry graph db created in '+(chemistryGraphEnd - chemistryGraphStart)+' milliseconds');
 

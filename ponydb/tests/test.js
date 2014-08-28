@@ -1,9 +1,9 @@
 var expect = require('./chai.js').expect;
-var Helios = require('../lib/heliosDB.js');
+var PonyDB = require('../ponydb.js');
 var g;
 
 before(function(done){
-	var db = new Helios.GraphDatabase();
+	var db = new PonyDB.GraphDatabase();
 
 	var testData = {
 		"graph": {

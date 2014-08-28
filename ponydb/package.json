@@ -1,17 +1,17 @@
 {
-  "name": "helios",
-  "version": "0.2.0",
+  "name": "ponydb",
+  "version": "1.0.0",
   "description": "In-memory graph database for node.js",
-  "main": "helios.js",
+  "main": "ponydb.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt mochaTest"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/morris-singer-cengage/helios-node.git"
+    "url": "https://github.com/morris-singer-cengage/ponydb.git"
   },
   "keywords": [
     "graph",

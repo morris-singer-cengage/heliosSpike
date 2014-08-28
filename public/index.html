@@ -9,6 +9,25 @@
 				border: 0;
 				background: none;
 				font-size: 12px;
+				font-family: "Menlo";
+				font-size: 12px;
+				font-weight: 600;
+			}
+
+			textarea {
+				font-family: "Menlo";
+				font-size: 12px;
+				font-weight: 600;
+				color: #333;
+			}
+
+			body {
+				background: url('./assets/pony.png');
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			div.panel {
+				background: rgba(255,255, 255, 0.9);
 			}
 		</style>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -65,7 +84,7 @@
 							<i class="fa fa-spinner fa-spin fa-5x"></i>
 						</div>
 
-						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;">
+						<div style="width: 100%; height: 350px; white-space: pre; font-size: 12px; padding: 10px;">
 							<div id="historyResult" ng-hide="loading"></div>
 						</div>
 					</div>
@@ -82,7 +101,7 @@
 							<i class="fa fa-spinner fa-spin fa-5x"></i>
 						</div>
 
-						<div style="width: 100%; height: 500px; white-space: pre; font-size: 12px; padding: 10px;">
+						<div style="width: 100%; height: 350px; white-space: pre; font-size: 12px; padding: 10px;">
 							<div id="chemistryResult" ng-hide="loading"></div>
 						</div>
 					</div>
@@ -99,7 +118,7 @@
 			<form class=" col-xs-12" ng-submit="runQuery();">
 				<div class="form-group">
 					<div class="form-group">
-						<textarea class="form-control" type="text" placeholder="Enter query, e.g., V().index(1)" ng-model="query"></textarea>
+						<textarea class="form-control" rows="10" type="text" placeholder="Enter query, e.g., V().index(1)" ng-model="query"></textarea>
 						<br />
 						<button class="btn btn-primary" type="button" ng-click="runQuery();">
 							<i class="fa fa-database"></i> Query PonyDB

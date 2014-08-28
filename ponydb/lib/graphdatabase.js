@@ -10,7 +10,7 @@ var toString = Object.prototype.toString, ArrayProto = Array.prototype, push = A
 var GraphDatabase = (function () {
 
 	function GraphDatabase(options) {
-		this.traceEnabled = false;
+		this.traceEnabled = true;
 		this.meta = {
 			id: '_id',
 			label: '_label',
